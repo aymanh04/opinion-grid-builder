@@ -4,7 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Plus, BarChart3, Users, Eye, LogOut, Copy, Calendar } from 'lucide-react';
+import { Plus, BarChart3, Users, Eye, LogOut, Copy, Calendar, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import SurveyCreator from './SurveyCreator';
 import SurveyAnalytics from './SurveyAnalytics';
 import SurveyLinkGenerator from './SurveyLinkGenerator';
@@ -76,6 +87,20 @@ const AdminDashboard = ({ user, onLogout }) => {
     toast({
       title: "Link Copied",
       description: "Survey link has been copied to clipboard.",
+    });
+  };
+
+  const deleteSurvey = (surveyId) => {
+    const updatedSurveys = surveys.filter(survey => survey.id !== surveyId);
+    setSurveys(updatedSurveys);
+    localStorage.setItem('survey_templates', JSON.stringify(updatedSurveys));
+    
+    // Also remove any responses for this survey
+    localStorage.removeItem(`survey_responses_${surveyId}`);
+    
+    toast({
+      title: "Survey Deleted",
+      description: "Survey and all associated data have been permanently deleted.",
     });
   };
 
@@ -232,6 +257,35 @@ const AdminDashboard = ({ user, onLogout }) => {
                         <Copy className="w-4 h-4 mr-2" />
                         Copy Link
                       </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="text-red-600 border-red-200 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete Survey</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete "{survey.title}"? This action cannot be undone and will permanently delete all survey data including responses and analytics.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction 
+                              onClick={() => deleteSurvey(survey.id)}
+                              className="bg-red-600 hover:bg-red-700"
+                            >
+                              Delete Survey
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
                 ))}

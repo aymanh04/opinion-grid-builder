@@ -68,8 +68,8 @@ const SurveyAnalytics = ({ survey, onBack }) => {
       type: 'chart',
       data: Object.entries(counts).map(([option, count]) => ({
         option,
-        count,
-        percentage: ((count / questionResponses.length) * 100).toFixed(1)
+        count: Number(count),
+        percentage: ((Number(count) / questionResponses.length) * 100).toFixed(1)
       }))
     };
   };
