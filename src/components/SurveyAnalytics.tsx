@@ -40,7 +40,7 @@ const SurveyAnalytics = ({ survey, onBack }) => {
           const totalWeight = weights.reduce((sum, w) => sum + w, 0);
           const normalizedWeights = weights.map(w => w / totalWeight);
           
-          let random = Math.random();
+          const random = Math.random();
           let selectedIndex = 0;
           let cumulative = 0;
           

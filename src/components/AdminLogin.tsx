@@ -48,11 +48,6 @@ const AdminLogin = ({ onLogin }) => {
           )}
           Continue with Google
         </Button>
-        
-        <div className="text-center text-sm text-gray-500">
-          <LogIn className="w-4 h-4 inline mr-1" />
-          Secure admin authentication
-        </div>
       </CardContent>
     </Card>
   );

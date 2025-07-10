@@ -25,7 +25,7 @@ const PublicSurvey = () => {
   useEffect(() => {
     // Load survey data
     const savedSurveys = JSON.parse(localStorage.getItem('survey_templates') || '[]');
-    const foundSurvey = savedSurveys.find(s => s.id === surveyId);
+    const foundSurvey = savedSurveys.find((s: { id: string; }) => s.id === surveyId);
     
     if (foundSurvey) {
       setSurvey(foundSurvey);
