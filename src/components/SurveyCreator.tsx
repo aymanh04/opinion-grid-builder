@@ -1,260 +1,343 @@
+import React, { useState } from 'react';
+import {
+  Box,
+  Container,
+  Typography,
+  Paper,
+  Button,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Chip,
+  IconButton,
+  AppBar,
+  Toolbar,
+  Card,
+  CardContent,
+  CardHeader,
+  useTheme,
+} from '@mui/material';
+import {
+  Add as AddIcon,
+  Delete as DeleteIcon,
+  ArrowBack as ArrowBackIcon,
+  TextFields as TextFieldsIcon,
+  RadioButtonChecked as RadioIcon,
+  CheckBox as CheckBoxIcon,
+} from '@mui/icons-material';
+import { Survey, SurveyQuestion } from '@/types';
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, ArrowLeft, Type, List, CheckSquare } from 'lucide-react';
+interface SurveyCreatorProps {
+  onSurveyCreated: (survey: Omit<Survey, 'id'>) => void;
+  onCancel: () => void;
+}
 
-const SurveyCreator = ({ onSurveyCreated, onCancel }) => {
+interface CurrentQuestion {
+  type: 'text' | 'single' | 'multiple';
+  question: string;
+  options: string[];
+}
+
+const SurveyCreator: React.FC<SurveyCreatorProps> = ({ onSurveyCreated, onCancel }) => {
   const [surveyData, setSurveyData] = useState({
     title: '',
     description: '',
-    questions: []
+    questions: [] as SurveyQuestion[],
   });
 
-  const [currentQuestion, setCurrentQuestion] = useState({
+  const [currentQuestion, setCurrentQuestion] = useState<CurrentQuestion>({
     type: 'text',
     question: '',
-    options: ['']
+    options: [''],
   });
 
-  const addQuestion = () => {
+  const theme = useTheme();
+
+  const addQuestion = (): void => {
     if (!currentQuestion.question.trim()) return;
-    
-    const newQuestion = {
+
+    const newQuestion: SurveyQuestion = {
       id: Date.now().toString(),
-      ...currentQuestion,
-      options: currentQuestion.type === 'text' ? [] : currentQuestion.options.filter(opt => opt.trim())
+      type: currentQuestion.type,
+      question: currentQuestion.question,
+      options: currentQuestion.type === 'text' ? [] : currentQuestion.options.filter(opt => opt.trim()),
     };
-    
+
     setSurveyData(prev => ({
       ...prev,
-      questions: [...prev.questions, newQuestion]
+      questions: [...prev.questions, newQuestion],
     }));
-    
+
     setCurrentQuestion({
       type: 'text',
       question: '',
-      options: ['']
+      options: [''],
     });
   };
 
-  const removeQuestion = (questionId) => {
+  const removeQuestion = (questionId: string): void => {
     setSurveyData(prev => ({
       ...prev,
-      questions: prev.questions.filter(q => q.id !== questionId)
+      questions: prev.questions.filter(q => q.id !== questionId),
     }));
   };
 
-  const updateOption = (index, value) => {
+  const updateOption = (index: number, value: string): void => {
     setCurrentQuestion(prev => ({
       ...prev,
-      options: prev.options.map((opt, i) => i === index ? value : opt)
+      options: prev.options.map((opt, i) => (i === index ? value : opt)),
     }));
   };
 
-  const addOption = () => {
+  const addOption = (): void => {
     setCurrentQuestion(prev => ({
       ...prev,
-      options: [...prev.options, '']
+      options: [...prev.options, ''],
     }));
   };
 
-  const removeOption = (index) => {
+  const removeOption = (index: number): void => {
     setCurrentQuestion(prev => ({
       ...prev,
-      options: prev.options.filter((_, i) => i !== index)
+      options: prev.options.filter((_, i) => i !== index),
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (): void => {
     if (!surveyData.title.trim() || surveyData.questions.length === 0) {
       alert('Please provide a title and at least one question');
       return;
     }
-    
-    const newSurvey = {
+
+    const newSurvey: Omit<Survey, 'id'> = {
       ...surveyData,
       status: 'draft',
       responses: 0,
       createdAt: new Date().toISOString().split('T')[0],
-      lastModified: new Date().toISOString().split('T')[0]
+      lastModified: new Date().toISOString().split('T')[0],
     };
-    
+
     onSurveyCreated(newSurvey);
   };
 
-  const getQuestionIcon = (type) => {
+  const getQuestionIcon = (type: string) => {
     switch (type) {
-      case 'text': return <Type className="w-4 h-4" />;
-      case 'multiple': return <CheckSquare className="w-4 h-4" />;
-      case 'single': return <List className="w-4 h-4" />;
-      default: return <Type className="w-4 h-4" />;
+      case 'text': return <TextFieldsIcon />;
+      case 'multiple': return <CheckBoxIcon />;
+      case 'single': return <RadioIcon />;
+      default: return <TextFieldsIcon />;
+    }
+  };
+
+  const getQuestionTypeLabel = (type: string): string => {
+    switch (type) {
+      case 'text': return 'Text Field';
+      case 'multiple': return 'Multiple Choice';
+      case 'single': return 'Single Choice';
+      default: return 'Text Field';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <div className="container mx-auto px-6 py-8">
-        <div className="flex items-center mb-8">
-          <Button variant="ghost" onClick={onCancel} className="mr-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
-          </Button>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+    <Box sx={{ minHeight: '100vh', backgroundColor: theme.palette.background.default }}>
+      <AppBar position="static" elevation={1}>
+        <Toolbar>
+          <IconButton
+            edge="start"
+            color="inherit"
+            onClick={onCancel}
+            sx={{ mr: 2 }}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
             Create New Survey
-          </h1>
-        </div>
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Box sx={{ display: 'flex', gap: 4, flexDirection: { xs: 'column', lg: 'row' } }}>
           {/* Survey Details */}
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle>Survey Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Survey Title</label>
-                <Input
+          <Box sx={{ flex: 1 }}>
+            <Card sx={{ mb: 4 }}>
+              <CardHeader title="Survey Details" />
+              <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <TextField
+                  label="Survey Title"
                   value={surveyData.title}
                   onChange={(e) => setSurveyData(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="Enter survey title"
-                  className="border-gray-200"
+                  fullWidth
+                  required
                 />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                <Textarea
+
+                <TextField
+                  label="Description"
                   value={surveyData.description}
                   onChange={(e) => setSurveyData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Describe your survey"
-                  className="border-gray-200"
+                  fullWidth
+                  multiline
                   rows={3}
                 />
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Add Question */}
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle>Add Question</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Question Type</label>
-                <Select value={currentQuestion.type} onValueChange={(value) => setCurrentQuestion(prev => ({ ...prev, type: value, options: value === 'text' ? [] : [''] }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="text">Text Field</SelectItem>
-                    <SelectItem value="single">Single Choice</SelectItem>
-                    <SelectItem value="multiple">Multiple Choice</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Question</label>
-                <Input
+            {/* Add Question */}
+            <Card>
+              <CardHeader title="Add Question" />
+              <CardContent sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Question Type</InputLabel>
+                  <Select
+                    value={currentQuestion.type}
+                    label="Question Type"
+                    onChange={(e) => setCurrentQuestion(prev => ({ 
+                      ...prev, 
+                      type: e.target.value as 'text' | 'single' | 'multiple',
+                      options: e.target.value === 'text' ? [] : [''] 
+                    }))}
+                  >
+                    <MenuItem value="text">Text Field</MenuItem>
+                    <MenuItem value="single">Single Choice</MenuItem>
+                    <MenuItem value="multiple">Multiple Choice</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  label="Question"
                   value={currentQuestion.question}
                   onChange={(e) => setCurrentQuestion(prev => ({ ...prev, question: e.target.value }))}
                   placeholder="Enter your question"
-                  className="border-gray-200"
+                  fullWidth
+                  required
                 />
-              </div>
-              
-              {currentQuestion.type !== 'text' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Options</label>
-                  <div className="space-y-2">
-                    {currentQuestion.options.map((option, index) => (
-                      <div key={index} className="flex gap-2">
-                        <Input
-                          value={option}
-                          onChange={(e) => updateOption(index, e.target.value)}
-                          placeholder={`Option ${index + 1}`}
-                          className="border-gray-200"
-                        />
-                        {currentQuestion.options.length > 1 && (
-                          <Button variant="outline" size="sm" onClick={() => removeOption(index)}>
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </div>
-                    ))}
-                    <Button variant="outline" onClick={addOption} className="w-full">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Option
-                    </Button>
-                  </div>
-                </div>
-              )}
-              
-              <Button onClick={addQuestion} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Question
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
 
-        {/* Questions List */}
-        <Card className="mt-8 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-          <CardHeader>
-            <CardTitle>Questions ({surveyData.questions.length})</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {surveyData.questions.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                No questions added yet. Start by adding your first question above.
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {surveyData.questions.map((question, index) => (
-                  <div key={question.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="outline" className="flex items-center gap-1">
-                            {getQuestionIcon(question.type)}
-                            {question.type === 'text' ? 'Text Field' : question.type === 'single' ? 'Single Choice' : 'Multiple Choice'}
-                          </Badge>
-                          <span className="text-sm text-gray-500">Question {index + 1}</span>
-                        </div>
-                        <p className="font-medium text-gray-900 mb-2">{question.question}</p>
-                        {question.options.length > 0 && (
-                          <ul className="text-sm text-gray-600 ml-4 list-disc">
-                            {question.options.map((option, optIndex) => (
-                              <li key={optIndex}>{option}</li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                      <Button variant="outline" size="sm" onClick={() => removeQuestion(question.id)}>
-                        <Trash2 className="w-4 h-4" />
+                {currentQuestion.type !== 'text' && (
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>
+                      Options
+                    </Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {currentQuestion.options.map((option, index) => (
+                        <Box key={index} sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                          <TextField
+                            value={option}
+                            onChange={(e) => updateOption(index, e.target.value)}
+                            placeholder={`Option ${index + 1}`}
+                            fullWidth
+                            size="small"
+                          />
+                          {currentQuestion.options.length > 1 && (
+                            <IconButton 
+                              onClick={() => removeOption(index)}
+                              color="error"
+                              size="small"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          )}
+                        </Box>
+                      ))}
+                      <Button
+                        variant="outlined"
+                        onClick={addOption}
+                        startIcon={<AddIcon />}
+                        size="small"
+                      >
+                        Add Option
                       </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                    </Box>
+                  </Box>
+                )}
 
-        {/* Submit */}
-        <div className="mt-8 flex justify-end">
-          <Button onClick={handleSubmit} className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-8">
-            Create Survey
-          </Button>
-        </div>
-      </div>
-    </div>
+                <Button
+                  variant="contained"
+                  onClick={addQuestion}
+                  startIcon={<AddIcon />}
+                  fullWidth
+                  size="large"
+                >
+                  Add Question
+                </Button>
+              </CardContent>
+            </Card>
+          </Box>
+
+          {/* Questions List */}
+          <Box sx={{ flex: 1 }}>
+            <Card>
+              <CardHeader title={`Questions (${surveyData.questions.length})`} />
+              <CardContent>
+                {surveyData.questions.length === 0 ? (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      No questions added yet. Start by adding your first question.
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {surveyData.questions.map((question, index) => (
+                      <Paper key={question.id} sx={{ p: 2, border: 1, borderColor: 'divider' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                          <Box sx={{ flex: 1 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                              <Chip
+                                icon={getQuestionIcon(question.type)}
+                                label={getQuestionTypeLabel(question.type)}
+                                size="small"
+                                variant="outlined"
+                              />
+                              <Typography variant="caption" color="text.secondary">
+                                Question {index + 1}
+                              </Typography>
+                            </Box>
+                            <Typography variant="body1" sx={{ fontWeight: 'medium', mb: 1 }}>
+                              {question.question}
+                            </Typography>
+                            {question.options.length > 0 && (
+                              <Box sx={{ ml: 2 }}>
+                                {question.options.map((option, optIndex) => (
+                                  <Typography key={optIndex} variant="body2" color="text.secondary">
+                                    • {option}
+                                  </Typography>
+                                ))}
+                              </Box>
+                            )}
+                          </Box>
+                          <IconButton
+                            onClick={() => removeQuestion(question.id)}
+                            color="error"
+                            size="small"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </Box>
+                      </Paper>
+                    ))}
+                  </Box>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Submit Button */}
+            <Box sx={{ mt: 4, textAlign: 'right' }}>
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                size="large"
+                sx={{ px: 4 }}
+              >
+                Create Survey
+              </Button>
+            </Box>
+          </Box>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 
