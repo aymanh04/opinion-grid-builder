@@ -27,7 +27,7 @@ import {
   RadioButtonChecked as RadioIcon,
   CheckBox as CheckBoxIcon,
 } from '@mui/icons-material';
-import { Survey, SurveyQuestion } from '@/types';
+import { Survey, SurveyQuestion } from '@/types/types';
 
 interface SurveyCreatorProps {
   onSurveyCreated: (survey: Omit<Survey, 'id'>) => void;

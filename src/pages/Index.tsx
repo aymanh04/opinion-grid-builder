@@ -6,15 +6,9 @@ import {
   Paper,
   useTheme,
 } from '@mui/material';
-import {
-  BarChart as BarChartIcon,
-  People as PeopleIcon,
-  Description as DescriptionIcon,
-  TrendingUp as TrendingUpIcon,
-} from '@mui/icons-material';
 import AdminLogin from '@/components/AdminLogin';
 import AdminDashboard from '@/components/AdminDashboard';
-import { User } from '@/types';
+import { User } from '@/types/types';
 
 const Index: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -79,19 +73,6 @@ const Index: React.FC = () => {
             LHP Survey Portal
           </Typography>
           
-          <Typography
-            variant="h6"
-            component="p"
-            sx={{
-              color: theme.palette.text.secondary,
-              mb: 4,
-              maxWidth: '600px',
-              mx: 'auto',
-            }}
-          >
-            Create, manage, and analyze surveys with our comprehensive survey platform
-          </Typography>
-
           <AdminLogin onLogin={handleLogin} />
         </Paper>
       </Container>

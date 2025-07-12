@@ -5,7 +5,6 @@ import {
   Typography,
   Paper,
   Button,
-  Grid,
   Card,
   CardContent,
   Chip,
@@ -35,7 +34,7 @@ import { toast } from 'sonner';
 import SurveyCreator from './SurveyCreator';
 import SurveyAnalytics from './SurveyAnalytics';
 import SurveyLinkGenerator from './SurveyLinkGenerator';
-import { User, Survey } from '@/types';
+import { User, Survey } from '@/types/types';
 
 interface AdminDashboardProps {
   user: User;

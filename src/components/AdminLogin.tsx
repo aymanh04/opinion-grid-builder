@@ -1,8 +1,10 @@
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Chrome, LogIn } from 'lucide-react';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import { Chrome } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 const AdminLogin = ({ onLogin }) => {
@@ -30,21 +32,40 @@ const AdminLogin = ({ onLogin }) => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-white/80 backdrop-blur-sm border-0 shadow-xl">
-      <CardHeader className="text-center pb-2">
-        <CardTitle className="text-2xl font-bold text-gray-900">Admin Portal</CardTitle>
-        <p className="text-gray-600">Sign in to manage your surveys</p>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <Card sx={{ 
+      width: '100%', 
+      maxWidth: '28rem', 
+      mx: 'auto',
+      background: 'rgba(255, 255, 255, 0.8)',
+      backdropFilter: 'blur(8px)',
+      border: 0,
+      boxShadow: '1 20px 25px -5px rgb(0 0 0 / 0.1)'
+    }}>
+      <CardContent sx={{ textAlign: 'center' }}>
         <Button
           onClick={handleGoogleLogin}
           disabled={isLoading}
-          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 h-12 text-lg font-medium"
+          fullWidth
+          variant="contained"
+          sx={{
+            backgroundColor: '#fff',
+            color: '#3c4043',
+            boxShadow: '0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)',
+            '&:hover': {
+              backgroundColor: '#f8f9fa',
+              boxShadow: '0 1px 3px 0 rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15)',
+            },
+            border: '1px solid #dadce0',
+            height: '48px',
+            fontSize: '1.125rem',
+            fontWeight: 500,
+            textTransform: 'none'
+          }}
         >
           {isLoading ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+            <div className="w-5 h-5 border-2 border-gray-600 border-t-transparent rounded-full animate-spin mr-2" />
           ) : (
-            <Chrome className="w-5 h-5 mr-2" />
+            <Chrome className="w-5 h-5 mr-2 text-[#4285f4]" />
           )}
           Continue with Google
         </Button>
