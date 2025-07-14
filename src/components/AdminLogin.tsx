@@ -2,12 +2,16 @@
 import { useState } from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { Chrome } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { User } from '@/types/types';
 
-const AdminLogin = ({ onLogin }) => {
+interface AdminLoginProps {
+  onLogin: (userData: User) => void;
+}
+
+const AdminLogin = ({ onLogin }: AdminLoginProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGoogleLogin = async () => {

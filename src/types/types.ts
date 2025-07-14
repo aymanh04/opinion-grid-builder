@@ -44,10 +44,13 @@ export interface SurveyAnalyticsData {
   }>;
 }
 
-// New interfaces based on project usage
 export interface DateRange {
   startDate: string;
   endDate: string;
+}
+export enum SurveyStatus {
+  Active = 'active',
+  Inactive = 'inactive',
 }
 
 export interface GeneratedLink {
@@ -59,21 +62,7 @@ export interface GeneratedLink {
   endDate: string;
   createdAt: string;
   responses: number;
-  status: 'active' | 'inactive';
-}
-
-export interface SurveyLinkGeneratorProps {
-  surveys: Survey[];
-  onBack: () => void;
-}
-
-export interface SurveyCreatorProps {
-  onSurveyCreated: (survey: Survey) => void;
-  onCancel: () => void;
-}
-
-export interface AdminLoginProps {
-  onLogin: (userData: User) => void;
+  status: SurveyStatus;
 }
 
 export interface PublicSurveyProps {
@@ -81,7 +70,6 @@ export interface PublicSurveyProps {
   sessionId?: string;
 }
 
-// Remove the generic ComponentProps and keep other interfaces unchanged
 export interface ToastProps {
   title: string;
   description: string;

@@ -1,13 +1,26 @@
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowLeft, Users, BarChart3, Eye, Download, FileText, TrendingUp, Calendar } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Area, AreaChart } from 'recharts';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import { ArrowLeft, Users, BarChart3, Eye, FileText } from 'lucide-react';
 
-const SurveyAnalytics = ({ survey, onBack }) => {
+// Import our new components
+import OverviewSection from './analytics/OverviewSection';
+import ResponsesSection from './analytics/ResponsesSection';
+import ReportsSection from './analytics/ReportsSection';
+import ResponseModal from './analytics/ResponseModal';
+import { Survey } from '@/types/types';
+
+interface SurveyAnalyticsProps {
+  survey: Survey;
+  onBack: () => void;
+}
+
+const SurveyAnalytics = ({ survey, onBack }: SurveyAnalyticsProps) => {
   const [responses, setResponses] = useState([]);
   const [selectedResponse, setSelectedResponse] = useState(null);
   const [viewMode, setViewMode] = useState('overview'); // 'overview', 'responses', 'reports'
@@ -146,376 +159,156 @@ const SurveyAnalytics = ({ survey, onBack }) => {
     window.URL.revokeObjectURL(url);
   };
 
-  const COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#6366F1'];
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <div className="container mx-auto px-6 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center">
-            <Button variant="ghost" onClick={onBack} className="mr-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+    <Box sx={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(to bottom right, #EEF2FF, #E0E7FF, #F5F3FF)',
+      py: 4,
+      px: 3
+    }}>
+      <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          mb: 4 
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Button 
+              variant="text" 
+              onClick={onBack} 
+              startIcon={<ArrowLeft />}
+              sx={{ mr: 2 }}
+            >
               Back to Dashboard
             </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{survey.title}</h1>
-              <p className="text-gray-600">{survey.description}</p>
-            </div>
-          </div>
-          <div className="flex gap-2">
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{survey.title}</Typography>
+              <Typography variant="body1" color="text.secondary">{survey.description}</Typography>
+            </Box>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
             <Button
-              variant={viewMode === 'overview' ? 'default' : 'outline'}
+              variant={viewMode === 'overview' ? 'contained' : 'outlined'}
               onClick={() => setViewMode('overview')}
+              startIcon={<BarChart3 />}
             >
-              <BarChart3 className="w-4 h-4 mr-2" />
               Overview
             </Button>
             <Button
-              variant={viewMode === 'responses' ? 'default' : 'outline'}
+              variant={viewMode === 'responses' ? 'contained' : 'outlined'}
               onClick={() => setViewMode('responses')}
+              startIcon={<Eye />}
             >
-              <Eye className="w-4 h-4 mr-2" />
               Responses
             </Button>
             <Button
-              variant={viewMode === 'reports' ? 'default' : 'outline'}
+              variant={viewMode === 'reports' ? 'contained' : 'outlined'}
               onClick={() => setViewMode('reports')}
+              startIcon={<FileText />}
             >
-              <FileText className="w-4 h-4 mr-2" />
               Reports
             </Button>
-          </div>
-        </div>
+          </Box>
+        </Box>
 
         {/* Summary Stats */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-sm">Total Responses</p>
-                  <p className="text-3xl font-bold">{responses.length}</p>
-                </div>
-                <Users className="w-8 h-8 text-blue-200" />
-              </div>
-            </CardContent>
-          </Card>
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid size={{ xs: 12, md:4}}>
+            <Card sx={{ 
+              background: 'linear-gradient(to bottom right, #3B82F6, #2563EB)',
+              color: 'white',
+              boxShadow: 3
+            }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Box>
+                    <Typography sx={{ color: 'rgba(255,255,255,0.8)' }} variant="body2">
+                      Total Responses
+                    </Typography>
+                    <Typography variant="h4">{responses.length}</Typography>
+                  </Box>
+                  <Users />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid size={{ xs: 12, md:4}}>
+            <Card sx={{ 
+              background: 'linear-gradient(to bottom right, #8B5CF6, #7C3AED)',
+              color: 'white',
+              boxShadow: 3
+            }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Box>
+                    <Typography sx={{ color: 'rgba(255,255,255,0.8)' }} variant="body2">
+                      Questions
+                    </Typography>
+                    <Typography variant="h4">{survey.questions?.length || 0}</Typography>
+                  </Box>
+                  <BarChart3 />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid size={{ xs: 12, md:4}}>
+            <Card sx={{ 
+              background: 'linear-gradient(to bottom right, #10B981, #059669)',
+              color: 'white',
+              boxShadow: 3
+            }}>
+              <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Box>
+                    <Typography sx={{ color: 'rgba(255,255,255,0.8)' }} variant="body2">
+                      Completion Rate
+                    </Typography>
+                    <Typography variant="h4">94%</Typography>
+                  </Box>
+                  <Eye />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
 
-          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100 text-sm">Questions</p>
-                  <p className="text-3xl font-bold">{survey.questions?.length || 0}</p>
-                </div>
-                <BarChart3 className="w-8 h-8 text-purple-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white border-0">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-emerald-100 text-sm">Completion Rate</p>
-                  <p className="text-3xl font-bold">94%</p>
-                </div>
-                <Eye className="w-8 h-8 text-emerald-200" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
+        {/* Main Content Sections */}
         {viewMode === 'overview' && (
-          <>
-            <div className="grid lg:grid-cols-2 gap-8 mb-8">
-              {/* Response Frequency Chart */}
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5" />
-                    Response Frequency Over Time
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <AreaChart data={getResponseFrequency()}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Area type="monotone" dataKey="responses" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.3} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-
-              {/* Quick Actions */}
-              <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button 
-                    onClick={generateReport}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Generate Full Report
-                  </Button>
-                  <Button 
-                    onClick={() => setViewMode('responses')}
-                    variant="outline" 
-                    className="w-full"
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    View All Responses
-                  </Button>
-                  <Button 
-                    onClick={() => {
-                      const csvContent = [
-                        ['Response ID', 'Submitted At', 'IP Hash', ...survey.questions?.map(q => q.question) || []],
-                        ...responses.map(r => [
-                          r.id,
-                          new Date(r.submittedAt).toLocaleString(),
-                          r.ipHash,
-                          ...r.answers.map(a => Array.isArray(a.answer) ? a.answer.join('; ') : a.answer)
-                        ])
-                      ].map(row => row.join(',')).join('\n');
-                      
-                      const blob = new Blob([csvContent], { type: 'text/csv' });
-                      const url = window.URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = `${survey.title}_responses.csv`;
-                      a.click();
-                      window.URL.revokeObjectURL(url);
-                    }}
-                    variant="outline" 
-                    className="w-full"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Export CSV
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Question Analytics */}
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900">Question Analytics</h2>
-              
-              {survey.questions?.map((question, index) => {
-                const analytics = getQuestionAnalytics(question);
-                
-                return (
-                  <Card key={question.id} className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-                    <CardHeader>
-                      <CardTitle className="text-lg">
-                        Q{index + 1}: {question.question}
-                      </CardTitle>
-                      <Badge variant="outline">
-                        {question.type === 'text' ? 'Text Response' : question.type === 'single' ? 'Single Choice' : 'Multiple Choice'}
-                      </Badge>
-                    </CardHeader>
-                    <CardContent>
-                      {analytics.type === 'text' ? (
-                        <div className="space-y-4">
-                          <p className="text-sm text-gray-600">{analytics.responses.length} text responses</p>
-                          <div className="max-h-60 overflow-y-auto space-y-3">
-                            {analytics.responses.map((response, i) => (
-                              <div key={i} className="p-3 bg-gray-50 rounded-lg border text-sm">
-                                <div className="flex justify-between items-start mb-2">
-                                  <span className="font-medium text-gray-700">Response #{i + 1}</span>
-                                  <span className="text-xs text-gray-500">{response.length} characters</span>
-                                </div>
-                                <p className="text-gray-800">"{response}"</p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="grid lg:grid-cols-2 gap-6">
-                          <div>
-                            <ResponsiveContainer width="100%" height={250}>
-                              <BarChart data={analytics.data}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="option" />
-                                <YAxis />
-                                <Tooltip />
-                                <Bar dataKey="count" fill="#3B82F6" />
-                              </BarChart>
-                            </ResponsiveContainer>
-                          </div>
-                          <div>
-                            <ResponsiveContainer width="100%" height={250}>
-                              <PieChart>
-                                <Pie
-                                  data={analytics.data}
-                                  cx="50%"
-                                  cy="50%"
-                                  outerRadius={80}
-                                  fill="#8884d8"
-                                  dataKey="count"
-                                  label={({ option, percentage }) => `${option}: ${percentage}%`}
-                                >
-                                  {analytics.data.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                  ))}
-                                </Pie>
-                                <Tooltip />
-                              </PieChart>
-                            </ResponsiveContainer>
-                          </div>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </>
+          <OverviewSection 
+            survey={survey}
+            responses={responses}
+            getQuestionAnalytics={getQuestionAnalytics}
+            getResponseFrequency={getResponseFrequency}
+            generateReport={generateReport}
+            setViewMode={setViewMode}
+          />
         )}
 
         {viewMode === 'responses' && (
-          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Eye className="w-5 h-5" />
-                Individual Responses ({responses.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Response ID</TableHead>
-                    <TableHead>Submitted</TableHead>
-                    <TableHead>IP Hash</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {responses.map((response) => (
-                    <TableRow key={response.id}>
-                      <TableCell className="font-medium">#{response.id}</TableCell>
-                      <TableCell>{new Date(response.submittedAt).toLocaleString()}</TableCell>
-                      <TableCell className="font-mono text-sm">{response.ipHash.substr(0, 12)}...</TableCell>
-                      <TableCell>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setSelectedResponse(response)}
-                        >
-                          View Details
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <ResponsesSection 
+            responses={responses}
+            setSelectedResponse={setSelectedResponse}
+          />
         )}
 
         {viewMode === 'reports' && (
-          <div className="grid lg:grid-cols-2 gap-8">
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="w-5 h-5" />
-                  Survey Summary
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <p className="text-sm text-blue-600 font-medium">Total Questions</p>
-                    <p className="text-2xl font-bold text-blue-800">{survey.questions?.length || 0}</p>
-                  </div>
-                  <div className="bg-purple-50 p-4 rounded-lg">
-                    <p className="text-sm text-purple-600 font-medium">Total Responses</p>
-                    <p className="text-2xl font-bold text-purple-800">{responses.length}</p>
-                  </div>
-                  <div className="bg-emerald-50 p-4 rounded-lg">
-                    <p className="text-sm text-emerald-600 font-medium">Avg. Daily Responses</p>
-                    <p className="text-2xl font-bold text-emerald-800">
-                      {Math.round(responses.length / Math.max(1, getResponseFrequency().length))}
-                    </p>
-                  </div>
-                  <div className="bg-orange-50 p-4 rounded-lg">
-                    <p className="text-sm text-orange-600 font-medium">Response Rate</p>
-                    <p className="text-2xl font-bold text-orange-800">94%</p>
-                  </div>
-                </div>
-                <Button onClick={generateReport} className="w-full">
-                  <Download className="w-4 h-4 mr-2" />
-                  Download Full Report
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5" />
-                  Response Timeline
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={getResponseFrequency()}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey="responses" stroke="#3B82F6" strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
+          <ReportsSection 
+            survey={survey}
+            responses={responses}
+            getResponseFrequency={getResponseFrequency}
+            generateReport={generateReport}
+          />
         )}
 
         {/* Response Detail Modal */}
-        {selectedResponse && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-              <CardHeader>
-                <CardTitle>Response #{selectedResponse.id} Details</CardTitle>
-                <p className="text-sm text-gray-600">
-                  Submitted: {new Date(selectedResponse.submittedAt).toLocaleString()}
-                </p>
-                <p className="text-sm text-gray-600">
-                  IP Hash: {selectedResponse.ipHash}
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {selectedResponse.answers.map((answer, index) => {
-                  const question = survey.questions?.find(q => q.id === answer.questionId);
-                  return (
-                    <div key={index} className="border border-gray-200 rounded-lg p-4">
-                      <p className="font-medium text-gray-900 mb-2">{question?.question}</p>
-                      <Badge variant="outline" className="mb-2">
-                        {question?.type === 'text' ? 'Text Response' : question?.type === 'single' ? 'Single Choice' : 'Multiple Choice'}
-                      </Badge>
-                      <div className="bg-gray-50 p-3 rounded">
-                        <p className="text-gray-700">
-                          {Array.isArray(answer.answer) ? answer.answer.join(', ') : answer.answer}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-                <div className="flex justify-end pt-4">
-                  <Button onClick={() => setSelectedResponse(null)}>Close</Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-      </div>
-    </div>
+        <ResponseModal 
+          selectedResponse={selectedResponse}
+          survey={survey}
+          onClose={() => setSelectedResponse(null)}
+        />
+      </Box>
+    </Box>
   );
 };
 

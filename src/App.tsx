@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from 'sonner';
 import Index from "./pages/Index";
-import PublicSurvey from "./pages/PublicSurvey";
+// import PublicSurvey from "./pages/PublicSurvey";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,7 +42,7 @@ const App: React.FC = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/survey/:surveyId" element={<PublicSurvey />} />
+          {/* <Route path="/survey/:surveyId" element={<PublicSurvey />} /> */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
